@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Photo Booth Main Interface V1</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "primary-content": "#23220f", // Dark text for contrast on yellow
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2d2c16",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "2rem", 
+                        "xl": "3rem", 
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'glow': '0 0 20px rgba(249, 245, 6, 0.4)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hide for carousel */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Shutter animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 245, 6, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(249, 245, 6, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 245, 6, 0); }
+        }
+        
+        .shutter-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .floating-text {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-100 font-display min-h-screen flex flex-col transition-colors duration-300 overflow-hidden">
+<!-- Top Navigation / Header -->
+<header class="w-full px-8 py-6 flex justify-between items-center z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-content">
+<span class="material-icons-round text-2xl">photo_camera</span>
+</div>
+<span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white">PopBooth</span>
+</div>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-icons-round text-gray-600 dark:text-gray-300">collections</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-icons-round text-gray-600 dark:text-gray-300">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center justify-center relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+<!-- Camera Viewport Container -->
+<div class="relative w-full max-w-4xl aspect-video bg-black rounded-xl overflow-hidden shadow-soft ring-4 ring-offset-4 ring-offset-background-light dark:ring-offset-background-dark ring-primary/30 dark:ring-primary/20 group">
+<!-- Simulated Camera Feed (Image) -->
+<img alt="Portrait of a smiling person in a photo booth setting" class="w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100" data-alt="Happy person looking at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCLO0cFKTcJdJwya3ZXZ7zbraPtlDhpjm75qh9SuoruxjyWBPEC6LcYuzKMTulycWtznZP5v3dJJVpUijkmWbxQsJ8nWwrmotlrQ5LbtPQs1iPEs9w2M409De-tHPQ_JRLHEv72-3Hs7GKNA4fbSDfXcUjrfcsn1dA5p4TdBdgB1CZtEkY7N7iE5mONckQoBRzkz2a69HTcTjXKo6vhV6FvdzDFSPTU2EW2G2IN3e0Z4-mBSUdG2sKidsWvmdVqBdeByihMnEotQs"/>
+<!-- Overlay Content -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<h2 class="text-6xl md:text-7xl lg:text-8xl font-black text-white drop-shadow-lg tracking-tight floating-text text-center leading-none">
+                    Ready?<br/>
+<span class="text-primary">Smile!</span>
+</h2>
+</div>
+<!-- Viewport Controls (Top Right) -->
+<div class="absolute top-6 right-6 flex flex-col gap-3">
+<button class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content transition-all flex items-center justify-center group/btn">
+<span class="material-icons-round group-hover/btn:animate-spin">loop</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content transition-all flex items-center justify-center">
+<span class="material-icons-round">fullscreen</span>
+</button>
+</div>
+<!-- Viewport Controls (Bottom Left/Right) -->
+<div class="absolute bottom-6 left-6 flex gap-3">
+<button class="h-10 px-4 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-white hover:text-black transition-all flex items-center gap-2 text-sm font-medium">
+<span class="material-icons-round text-lg">timer</span>
+<span>3s</span>
+</button>
+<button class="h-10 px-4 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-white hover:text-black transition-all flex items-center gap-2 text-sm font-medium">
+<span class="material-icons-round text-lg">flash_on</span>
+<span>Auto</span>
+</button>
+</div>
+<!-- Grid Lines Overlay (Optional detail) -->
+<div class="absolute inset-0 pointer-events-none opacity-20">
+<div class="w-full h-full border-[0.5px] border-white/50 grid grid-cols-3 grid-rows-3">
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+<div class="border-[0.5px] border-white/30"></div>
+</div>
+</div>
+</div>
+<!-- Controls Section -->
+<div class="w-full max-w-4xl mt-8 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 relative">
+<!-- Effects Carousel -->
+<div class="flex-1 w-full flex items-center justify-center md:justify-start gap-4 order-2 md:order-1">
+<button class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-primary hover:border-primary hover:text-primary-content transition-all shadow-sm flex items-center justify-center flex-shrink-0 z-10">
+<span class="material-icons-round">chevron_left</span>
+</button>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar py-2 mask-linear-gradient px-2 scroll-smooth w-full max-w-[300px] lg:max-w-[400px]">
+<!-- Effect Item: Active -->
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-16 h-16 rounded-full overflow-hidden ring-4 ring-primary shadow-glow transition-transform group-hover:scale-105">
+<img alt="Normal effect preview" class="w-full h-full object-cover" data-alt="Normal colorful filter preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYGLzVTJZQ41k-BQpaRlwRLnIVnvgQ7ZPJrB5Teq0kDADURxyTeaXgQwOhntN-JRKFkrC5MBw0qdoCOv2OajqbYNPyzEWqpg7CAjPxA9_U3CrrAocYqQ5vZllbgAorJ2x3HkAxgsJ2f34ZP_vPqE2UutawpsQ-VtATxwloJkSM_b6X9KDVhhcex9ufLfVs_scENKrqy7ax3C7iTwSLGEXTJ2ePEvA-6hbczVB1yQUvrEOgkUhFmjfI6n12xuyRg7wY6KReNHoXYaU"/>
+</div>
+<span class="text-xs font-bold text-gray-900 dark:text-white">Normal</span>
+</button>
+<!-- Effect Item -->
+<button class="flex flex-col items-center gap-2 group flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-16 h-16 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-gray-300 dark:group-hover:ring-gray-600 transition-all group-hover:scale-105">
+<img alt="Grayscale effect preview" class="w-full h-full object-cover grayscale" data-alt="Black and white filter preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr1DDscVUSWlLr-R2Nh8pDGKTx1lBBwDXEMp4GfwjNk4zIaCPG0uwEUdqSYg6ReI3BEGaBPuvhYrmjH88w9JbZKQG3xSql8aixmw7IeZyeBs3sNvA3cuk8RYeCc7GMa3V4UaIGKxWfv8xGdjbrduDjOTibBwB7bAlhI5owHF8XEYzn5m_B2r7tMm6iRrsxZnt2xayNFXDT94wm_4AZdKtBgCP7NWyN8OVemxzoWSERi_CrQ3iSFDzLtiSiFJgRPiqZ6PU1OmfFYm0"/>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">B&amp;W</span>
+</button>
+<!-- Effect Item -->
+<button class="flex flex-col items-center gap-2 group flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-16 h-16 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-gray-300 dark:group-hover:ring-gray-600 transition-all group-hover:scale-105 relative">
+<div class="absolute inset-0 bg-yellow-900/40 mix-blend-overlay"></div>
+<img alt="Retro effect preview" class="w-full h-full object-cover sepia contrast-125" data-alt="Sepia vintage filter preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxM4HAM-oYCwfm_cIayhQ5sQmDGqLG8K5vEbC_AjJmoosFWjvUxP5lFSRaoLWYRzeiobmjeQVF312GP63lQgUygkg4Yj7xD9jG8rP2Izh-OsR9nBjTv4qswZbQVqZqyt0Ex6Ilp1EUOfv1wiCB4x7aALdJg0xASp6fzLPYN7Ay4QXpe8TLrdNXz79WEy9wjSPUmch9EiBSzZcj1dr9nOHU0mIq9Ga6mbOacPyTbcqBbsSwtbTFbSojMk24UJUuPdEuVJXFiuGv8Rw"/>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Retro</span>
+</button>
+<!-- Effect Item -->
+<button class="flex flex-col items-center gap-2 group flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-16 h-16 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-gray-300 dark:group-hover:ring-gray-600 transition-all group-hover:scale-105">
+<img alt="Neon effect preview" class="w-full h-full object-cover hue-rotate-90" data-alt="Purple neon filter preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7OQpGn6ar6otf_r1Qb6MJkmVqsSJl6JCr9yNNw5tLQYPahx7mWmeulDzFvJogjuYyV3WXOZW6lCNYsZBgmOyfWJuNf87-2QhPge5ZvuCwRqitqKs8A5MjYdXMRr4Tye5t4HLkMJbCYHRUktLNKlslrENu-9L50VJsTaN5TYTd18KYvZxXX_ma_HLBzrK8A7XeQ2Fk_EgM86IvXdjjITGyVMUMY8VE6OstQT3bZCdt9pzuRXhhJDaxVHaiXHc50Su747kRaLLjcy0"/>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Neon</span>
+</button>
+</div>
+<button class="w-12 h-12 rounded-full bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-primary hover:border-primary hover:text-primary-content transition-all shadow-sm flex items-center justify-center flex-shrink-0 z-10">
+<span class="material-icons-round">chevron_right</span>
+</button>
+</div>
+<!-- Shutter Button (Centered relative to container on mobile, specific placement on desktop) -->
+<div class="flex items-center justify-center order-1 md:order-2 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-20">
+<button class="shutter-btn w-20 h-20 md:w-24 md:h-24 rounded-full bg-white dark:bg-surface-dark border-4 border-white dark:border-surface-dark shadow-xl flex items-center justify-center relative group transition-all duration-300">
+<!-- Outer Ring Glow -->
+<div class="absolute inset-0 rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-primary transition-colors"></div>
+<!-- Inner Pink Button -->
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-rose-500 group-hover:bg-rose-600 shadow-inner flex items-center justify-center transition-colors">
+<span class="material-icons-round text-white text-3xl md:text-4xl opacity-80 group-hover:opacity-100 transition-opacity">camera</span>
+</div>
+</button>
+</div>
+<!-- Spacer for Layout Balance on Desktop -->
+<div class="hidden md:flex flex-1 order-3 justify-end items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
+<!-- Additional secondary option could go here, or just empty space -->
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">Mode</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-sm font-medium">Single Shot</span>
+<span class="material-icons-round text-gray-400">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="w-full py-4 text-center text-xs text-gray-400 dark:text-gray-600">
+<p>Press <span class="font-bold border border-gray-300 dark:border-gray-700 rounded px-1 mx-1">Space</span> to capture</p>
+</footer>
+</body></html>

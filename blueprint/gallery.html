@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Photo Gallery Grid View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9f506",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#23220f",
+                        "neutral-dark": "#23220f", // Derived from background-dark for text on light
+                        "neutral-light": "#f8f8f5", // Derived from background-light for text on dark
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #e5e5e0;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #3f3e2a;
+        }
+
+        /* Hover animation classes */
+        .photo-card:hover .overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .photo-card .overlay {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .photo-card:hover img {
+            transform: scale(1.05);
+        }
+        .photo-card img {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-neutral-dark dark:text-neutral-light font-display min-h-screen flex flex-col transition-colors duration-300">
+<!-- Navbar -->
+<nav class="sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm border-b border-primary/20">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-20">
+<!-- Left: Back Button -->
+<div class="flex-shrink-0">
+<button class="group flex items-center gap-2 bg-primary hover:bg-primary/80 text-neutral-dark px-5 py-2.5 rounded-full font-semibold transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5 active:translate-y-0">
+<span class="material-icons-outlined text-lg group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                        Back to Camera
+                    </button>
+</div>
+<!-- Center: Logo/Brand (Optional context) -->
+<div class="hidden md:flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+<span class="material-icons-outlined text-neutral-dark text-xl">camera</span>
+</div>
+<span class="font-bold text-xl tracking-tight">SnapToy</span>
+</div>
+<!-- Right: Profile/Settings -->
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-icons-outlined text-2xl">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden border-2 border-primary">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgGqP7OJxFs0ZNBYSwzMFCqZpKNqgBt26TaL2sXZe2W70sM8l2SMkRtsSKRtIGk0AE1N7OOiYpU7O2qqD24nLpOHjMihlCB5UCRt3n1tH1q-dwXBU5F7pZG6YjBEtJ3nrrON2CYjN1_C0jSffC1Jvz2Hv-tMuUFQhPWBoNJjLd30HS37bu8yhUaMxILVKdmTlIVTnBbv12HKDIWXH4m82vwhoIpW7wUyG56Rq0hkPGPG6rhqSBpln9rTqJUIqY7EVkGjbjosUKR5I"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<!-- Header Section -->
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-2">My Photos</h1>
+<p class="text-neutral-dark/60 dark:text-neutral-light/60 text-lg font-medium">12 memories captured today</p>
+</div>
+<!-- Filters/Sort -->
+<div class="flex items-center gap-3">
+<span class="text-sm font-semibold opacity-60 uppercase tracking-wider">Sort by:</span>
+<select class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer hover:border-primary/50 transition-colors">
+<option>Newest First</option>
+<option>Oldest First</option>
+<option>Effect Used</option>
+</select>
+</div>
+</header>
+<!-- Photo Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+<!-- Photo Card 1: Retro -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Woman smiling in retro style" class="w-full h-full object-cover" data-alt="Portrait of a woman smiling with retro filter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZZjsifZ2wkbTDyRL1pV0TOzcOtW7K74k2A1--YsqLhef516TFnyXX71mpM9F8TKBU8la7nr4pRIagcU74889JQONGnVm_tiAFNSvvoFoN_FFOGftaQEEJ37LeFG0C77t_TYVvBvRNOlOgoEhmgX6Ti2kkBTtzmbo5d2dlaArnOtlNb4XWSdf8I_OpDjkk-yH4oEtVWwdGejlUeR1gOc2PTliASo0qnWeVIhWYYSGUisEUyWBQVHrt2NMgqlrXCmQ0L8qUb_AXLHY"/>
+<!-- Effect Badge -->
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-primary text-neutral-dark shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">auto_fix_high</span>
+                        Retro
+                    </span>
+</div>
+<!-- Hover Overlay -->
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg" title="Download">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg" title="Share">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 2: Mirror -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Woman posing with mirror effect" class="w-full h-full object-cover" data-alt="Artistic portrait with mirror reflection effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNf5NGFSY271jILeiaJhHZe-M7x6wHtkZWiKldZ-fLU4Y9URRj31Q2fqnz8PbH-t1wXJvUZ6h2nO7-3cYwWQRLecYX4eEIjGHxe40A7yDK8UwlLotVrhHnhzFACSRBi2jb_uBzvd3X--2cRhjKNOus20TzY9Nul9Jl7G5MG0vuwif4B7V2YV3wmwniqmIrQu6QWr8ZT4bJX4BRIBtdvQBmQTEHs_H6jepPrAyWuV-t22aeZUyKoe0tSBd6YlTiNyMY-BDi9csXiow"/>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white dark:bg-neutral-800 text-neutral-dark dark:text-neutral-light shadow-sm border border-neutral-200 dark:border-neutral-600">
+<span class="material-icons-outlined text-sm mr-1">flip</span>
+                        Mirror
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 3: Neon -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Neon lights portrait" class="w-full h-full object-cover" data-alt="Portrait bathed in vibrant neon lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3uY0BwwnnZTxdsQSOqP9htWgVSip8JgVAyrkrSMmMGbXN4PNwwFPwrCIMJPSa17mDAUr7JEgTQ_n68AG2UKb1xl123mYw85jh8SBaxmTchN1emVUr-guZaMj1zapmXNYJ4gSLQ07h8isdQgochXyaaiEsCsnUHXKSUn8IKFF-GwI1aZCUg_x8FdbTxLfkfhKaZO8i07QnrnCLS4K5bavC86qNai_l9Pu62FalE14IUSz5Qd5KybDQ1SpeZPzTWJwTFXpDtOYI1I4"/>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-500 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">bolt</span>
+                        Neon
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 4: B&W -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Black and white portrait" class="w-full h-full object-cover grayscale" data-alt="High contrast black and white portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYJ19nyO_NxFQqnSwZCqsCpRPMiCboQEH91nuj1PvfRyFTMlERjjmOSJqj0dUJdpelXv8S588cZm5XOfW0S1bnpr09YE6eSLpjr954yxQTaDdMHgVuGznURt_GxyZGRZUmJAi8vVa4D-DRZsCab2zG-WAc84DAPjSoq5A_q8j3LLRJYUnDOmjQoYORYAt7gzBEnvYkwyIGoZV6xl7WWdYOokzAGjT9sAEX9BsN3-yA56bK0GHVO5VSKx9m2_imtagfbxZ-OQvWelE"/>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-neutral-800 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">contrast</span>
+                        Mono
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 5: Fish Eye -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Smiling face close up" class="w-full h-full object-cover" data-alt="Happy face close up looking at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJn6su5s0fvijTDX_LPSmYMkoFFBhnCIq53Ue3LAd4lrcHIJLIQqpJkSeHdSBwIW-oyaMj4nFKNjg2XOy3qsoqcp11yCt4gilpNbe76f9UFhZLgR-JDFpmO3duLhxlf01lI19X6M2vO_9KyGHi3BZRQhNVK24rZQ52mQM4Yvep4DOxsCVfyuYC5zBDxSGkTJS_WoDj8zAyARQPbLH3YXmKuhjlxD2EzMeZ1D_YKtMJYsfzegw6VkYa4SRf5kZz0XrtBJIQURqZmX8"/>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-400 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">lens</span>
+                        Fish Eye
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 6: Sepia -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Woman smiling sepia tone" class="w-full h-full object-cover sepia" data-alt="Sepia toned portrait of a woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBATedjAcNhvFRx8oV8v5YcrYxdi6iB2bYXEjfnoQGEkIDfQ9TUL6W3yLtLwvW-Jan_Rtkw5mALvd9ScW5nYLXwRtIGh5VUy4lyPur8sDaCsqz6ApscXaKpmofuPH37RTls_q6CcGSOT-01FBPi4p9_R8LZvAINXU7GQk7Lmgs2k8vF5kMCLTuTWXDMYTPbk3FfC2EE_ckdGdjFEV5slr-7vnxKpT6AtSWPBRPWPCK-_WWDz4JslXMf54aQWJdDIh0Bv3wvOB5AJd0"/>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-700 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">history_edu</span>
+                        Vintage
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 7: Glitch -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<div class="relative w-full h-full">
+<img alt="Woman portrait with glitch effect" class="w-full h-full object-cover" data-alt="Portrait with digital glitch distortion effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiSHg5g-aJuXOSJ4XmVSac30AAE0OekzoKIfkqRdzp5NNq8ju9DPlPGCYRA-i0nHOpi9zmubpJTKMIM2i9maSMAEGJwSSoTNPvunDvL1X_nbXmG3U67nIlSOvm9IIZozSeU9jE0K6OtrLOA_V5l3Dej-NKMBh3_2eGGXHtw87ZgbU-AzOHVsdF8EuECVPKJ8cLLoKrUVAG_d96c9PQ2dCZdoHIh7H6dEMOddEI_gssDCB5L8T_Kbiq729WHHnYhcMqBadwMG2iYlk"/>
+<!-- Faux glitch overlay -->
+<div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-red-500/20 mix-blend-color-dodge"></div>
+</div>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-pink-600 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">broken_image</span>
+                        Glitch
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+<!-- Photo Card 8: Vignette -->
+<div class="photo-card group relative aspect-square rounded-xl overflow-hidden shadow-lg bg-white dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10">
+<img alt="Smiling woman vignette" class="w-full h-full object-cover" data-alt="Bright portrait with dark vignette edges" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9gGshR9k7DeP2Qml0DZI_9GdUci2pHDw2GBVjWZ3o9Tzp6nggJqChnc0X_7DrAByDtXHNV7Yw2YA822fmp8PZ3CZ3eM5cOMQJ0A9G7qzizuh2FVzYgyDCsoLk5Wu0ftOqkx509eNndL9fBrAoV4ljCqnj2ETl5BXVyREATb9B7Uf2tVY1N2PFGM2AeNCZU2H7fEL-f2nmDLkbinZ-WgI6ij8bTurXw_MP5fG5V3F9IObKyoSloIk-h9VLE54Yx3R6svIxl3Rn_J4"/>
+<!-- Vignette Overlay -->
+<div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.5) 100%);"></div>
+<div class="absolute bottom-4 left-4 z-10 pointer-events-none">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-neutral-900 text-white shadow-sm">
+<span class="material-icons-outlined text-sm mr-1">vignette</span>
+                        Vignette
+                    </span>
+</div>
+<div class="overlay absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-6">
+<div class="flex gap-3">
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">download</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white text-neutral-dark flex items-center justify-center hover:bg-primary transition-colors shadow-lg">
+<span class="material-icons-outlined">share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-white hover:text-red-400 transition-colors text-sm font-semibold mt-2">
+<span class="material-icons-outlined text-lg">delete</span>
+                        Delete
+                    </button>
+</div>
+</div>
+</div>
+<!-- Pagination / Load More -->
+<div class="mt-16 flex justify-center">
+<button class="bg-white dark:bg-neutral-800 text-neutral-dark dark:text-neutral-light border-2 border-primary hover:bg-primary hover:text-neutral-dark font-bold py-3 px-8 rounded-full transition-all duration-200 transform hover:scale-105 shadow-sm">
+                Load More Memories
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-background-light dark:bg-background-dark border-t border-neutral-200 dark:border-neutral-800 py-8 mt-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-neutral-dark/40 dark:text-neutral-light/40 text-sm">© 2023 SnapToy Inc. Let's get playful.</p>
+<div class="flex gap-4">
+<a class="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Terms</a>
+<a class="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Help</a>
+</div>
+</div>
+</footer>
+<!-- Floating Empty State Illustration (Hidden by default, shown if needed) -->
+<!-- 
+    <div class="hidden flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-64 h-64 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+             <span class="material-icons-outlined text-primary text-8xl">photo_camera</span>
+        </div>
+        <h2 class="text-3xl font-bold mb-2">No photos yet!</h2>
+        <p class="text-neutral-dark/60 mb-8 max-w-md">Your gallery is looking a little empty. Time to strike a pose and make some magic.</p>
+        <button class="bg-primary text-neutral-dark font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg">
+            Start Camera
+        </button>
+    </div> 
+    -->
+</body></html>

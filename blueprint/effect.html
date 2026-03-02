@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Full Grid Effects Selection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1380",
+                        "background-light": "#f8f6f7",
+                        "text-dark": "#1a1a1a",
+                        "text-muted": "#666666",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-text-dark min-h-screen flex flex-col overflow-hidden relative selection:bg-primary selection:text-white">
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]"></div>
+</div>
+<div class="relative z-10 flex flex-col h-screen w-full max-w-[1600px] mx-auto p-6 md:p-8">
+<header class="flex justify-between items-center mb-6 shrink-0 relative">
+<div class="w-12 h-12 md:w-14 md:h-14 hidden md:block"></div>
+<h1 class="text-3xl md:text-5xl font-bold tracking-tight text-text-dark drop-shadow-sm text-center">
+                Choose an Effect
+            </h1>
+<button class="group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white hover:bg-primary text-gray-800 hover:text-white rounded-full transition-all duration-300 ease-out border border-gray-200 hover:border-primary hover:rotate-90 hover:scale-110 shadow-sm hover:shadow-lg">
+<span class="material-icons text-3xl">close</span>
+<span class="sr-only">Close</span>
+</button>
+</header>
+<main class="flex-grow overflow-y-auto px-2 pb-8">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 auto-rows-fr">
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Person looking in mirror reflection" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Person looking in mirror reflection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ0jojZmqOv_f44ShFs_mmUBKqAlOdyOUbCA8uSEPmE0pF18J-vMIAtveNU4ZNhqDrLtzy6dk5mnj3iC63LkTSoBlrvCgN1gngtt8iT36vfIQgEprcCSNooh9DSCZ7DwuvOZ8VoXTjpVNgzoQ_2y4_0rfeCYllG50Uldq38oYxrK_cU_8Px9CZnBJMlgUUaRsw8klryaA7H56dd7Ao4ZzfedBov2BfvFkL9l5PegiXbn9IHck0lnsb3Lg1mk3ug-W6oiy5wED55Po"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Mirror</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Cyberpunk neon city street at night" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 saturate-150" data-alt="Cyberpunk neon city street at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMwrGwnCBecm6tUrJa1xtAS1aFSsK7FI8ylpfbZe0srG_OGt-SJ-K-mtCAfVCDpYvqrcm6u8visEYzhJKl000nJusH0bEAVoyNUwDHir5wKIcfgwjlFOTaj9afigFzz1WmWOTb9WKmuFsDtfaf_kosYEbUzwvn6CUiKKXQf057TekP9uvOvo1FF8c-HoSIUMe2OQendDU_G13OG3dRVxF1FXF9lbZW0ZHbjwTuwiRjI2xvq_TES8GEUGQcDRS9KG1MJl4i6O-xLXs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Neon</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Black and white pencil sketch portrait" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 grayscale contrast-125" data-alt="Black and white pencil sketch portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhc74wX2iE96a65urHaqN0VABfS6YVn9kW-Wo3KsZ-3Q2nef8cg9TsYdDnRs2MsYRjR_IGkDTI14SmMBJyEIW7RSS8yn2RYlDSPQsem74d3LtAOWPdYjahCgvFaO3sHSBMJPDrU4B1-KPWacZtkcjVajbNovQMz09Puzz-HnERqTcQyPSz7AQZQmvjFUEwbNlsq9TCbm8JrvK2QqcBCs3ljO1aCxdv_rV7paMpO_tnMRaQoYp4Kzo-u0dkDVUopNSQdHNl5cqYpqU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Sketch</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Heat map thermal imaging colors" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 hue-rotate-90 contrast-200" data-alt="Heat map thermal imaging colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYl2cYG7O4Xt6NOg_KH79yyPmQUC0ZYb7GkPy21Z-ARZxyLFX-4FrM6EJecaUZfvZ-L9TtsRZCCj4koXTVl0HA2n7mM4IV3YkkmPLujUSFT7J0hTFLvZuUpmEhwKFP5MoUUDPD5NFQxo2zHpRTK6hQNq1L588INLrZWpk4rlxpdeJFT0eD4-wuxxbdxvN_qIBeSqKXnB1HFIt-IikFJ98iNoX6z4otjGLET7Hkq51NXBkAEtUPtdb5hs8ysVwhfG4zt5KysyPRd4w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Thermal</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Sepia toned vintage photograph texture" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 sepia brightness-90" data-alt="Sepia toned vintage photograph texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm4EgXZPpdrLI3RCyYQCIjjnfM3wKJ2KWAVIfswoPCnq0y2xAzcAMAimBkC_BTCZrgkcH5zERkybOjAuI0zhYA1z0kzf0iqBiE3tskJPjzhCu5oBEeg7-cdBvk3C1CEOVhhXGXpPG021MwT_d1822Gn03sA6J8zmyYPUhwF3UAfjjPu6wfXo2UTfdOU_9QFgAdZg8CpB3pDnHEnOwXG5x3xeSPdhvPGPFPgcWAOzF-AIX5XuzANoeLvadjZasPZwm-y6-sXHRvfFg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Vintage</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Fisheye lens distortion of a room" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Fisheye lens distortion of a room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbEjyRGFrLM6ira-lRW9Q-ZdS6ETUqCSQadR_aaYZynhoDZcK1KPNgL3EXd3joLQ28K1IfxSB7ybpttimFNJ7X-_y_2e5TVFh3oWNOGjxpzRKdJbh-kbjuAMuvfwtxLF_tpSVqoyqZXdMBMmDebsnN406BOq-XB4TrCWEgcMauMCRYHu-NxqvAobDcDAvB9u6QM3XhOsUAiXN3EXCkk7q0glybBMWv5X6pYtAUlqx3G6hOAuyyUvN6MMg1hkRZXWptVmN96Kb8cEg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Fisheye</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Inverted negative x-ray style image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 invert" data-alt="Inverted negative x-ray style image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4trUYHr_nAbQVk6HGQbQ2Jg69xuJFnIM8SntbenUa_Dl78KygC-dNlpwyCjD4UYsdSBwBGNnCEXZkV02RSbUmRz1Uc460_bqONuRgCTVRKLvPFYDv4tUzXIP90IGiMJLJqVPddDJ3KuPb-cbB8TPoRefBLqMjIBz97xOb2ifvZF7YNdijwOpO6vBzpyQ4X0etRa-cJSWidnnVKPEVbgECnQApsBD78k8daQ8MTKQC2OngCj4_EM9k3JwGZi6ppSaJH77R4ni1X7s"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">X-Ray</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<div class="absolute inset-0 bg-white opacity-10 z-10 mix-blend-overlay pointer-events-none" style="background-image: radial-gradient(black 2px, transparent 2px); background-size: 8px 8px;"></div>
+<img alt="Pop art comic book style portrait" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 contrast-150 saturate-200" data-alt="Pop art comic book style portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9VHhI6KbhMgp8woDFO5B96O8_SntC3DylOzNrNRoYU5IQUDS-xDq-G7ZalhKQ-_2Nd9Ewitv7XCrwewCF--WdfJKLZGeQPiSWFKcK2JdRu2SaqjrfImY3pXniWS634c44xyjeE61OY9pxQgn1QL9MgkBPO5GDHNo9R0HuhTjjwb4G1iRo8DBTi-D6vtM5Sz3ouh4vPKr9JSfdLV9kE8lqXEBcNPjX_Nz2e-eBz-vblZr6UUro5jo-49yq1xBbiMV3J_-cVSOfLUM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Comic</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Digital glitch distortion effect" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Digital glitch distortion effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoU3pq6MHwNDqrfbRUlBE7J68xXFPrsJpDlJEsYXItN1Jl-_-GDrDVrY_rHl2sDA1VL4wv76945Q-lwPS2JusDl7dLLgkic4Ixq7LLkJ09ppoNC1aPsnvnQgvQy6g18gD785OhowKRO9kDw-rpJcNqK4zqfvpdpDn9ZjC2w-vXEB_64wnCqeUXWxNohyEeG9KPvfoP8Ir8kZraAG4HC4OezeTIc29BJ4E8ffeXxFr2-lBpJCS_08sKqjMDggs7ZrTDluTMHn9cZMk"/>
+<div class="absolute inset-0 bg-red-500/20 mix-blend-screen translate-x-1 opacity-50 group-hover:translate-x-2 transition-transform"></div>
+<div class="absolute inset-0 bg-blue-500/20 mix-blend-screen -translate-x-1 opacity-50 group-hover:-translate-x-2 transition-transform"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Glitch</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Falling snow overlay on scene" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Falling snow overlay on scene" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwsuxdEWAaZJ_DKfmYcc8lB5d3e0kgxYmyApTdTVsP4fxpn9iHvyw0zK1leWOBQ-mMbfL8rRFkFie7PUBsN5rPn03q16wGgaZcjRPxWBXDCIFfDZlYRY3RyfnxFH4UejfQpTvcip1TXGEvNW7vBXb2CURV1BuJfigkpqmsLoPxmpOmxfMl7YU1AnpI3LeWaTXN4-ae88PmXQ0_UHKNswDcmRqJIb7qfA_p8UlXjzT63F1F-6AVLHg20XbFtjAEEnF0Hcz3VQk5rPE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Snow</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Blue underwater distorted view" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 bg-blue-900 mix-blend-multiply" data-alt="Blue underwater distorted view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgSGiicJAP9xQETSF-m6g7uwxJYtDMfY2dz7vLXIUR2CMbIgmUG7ngzDhoDTMMcszwWrbJATqTL7aXQkhiiAjjK1hDINDOWhQJeHQXRBepIgW14cOuZEoe6Wx02Q9GuAo0zVxuobYnlZRldTA67rhv6o74pccBJwgltUKwYjXO4d8uttJtAOvq7OLBJeh6uzECRrtx8nXc1qIdHaDl1FVV3dUmy9aLyAp9ibQycEUWLKn5Jo3FZ5jwBgCnqHPa_OCYopjRb8mHKu4"/>
+<div class="absolute inset-0 bg-blue-500/20 mix-blend-overlay"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Underwater</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Low resolution pixelated image" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Low resolution pixelated image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGST4HP4HZVXCgtl4ZLDHjbihpjeXzs7W-S33cO77lQLvqbLu5tk95hZ1V594-WO164NRDllWikWLj-xKjil2WQ47KNANyJmSZjEZgQAEn4UvxkdkqWEK3e-4ObPjfVwpuy9WIh0Ml2O3HBpXysXTBYAqaKSEP_8FXKnsB_D9R51NraNxKLxP2vEMRaPoDyXOF1hRBqXRQQRvNokyF0drxU9tcq-1YMRMfM3tfsoziqMsp13Nft2wqc_U-RTrqGJioV-FwMJG2OlY" style="image-rendering: pixelated; filter: blur(2px);"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Pixelate</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Abstract kaleidoscope pattern" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 rotate-180" data-alt="Abstract kaleidoscope pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARL-xysLoaDUDmg_Y2zhmPGcEh9YLW9si8dMWhvHpFxeY6_Z_wyH41y7O6IzOKaW6M-QBysUM9GEEnIPSalg30n2lWRu-Jqcht-gcLI9PV8wa3IzKfJ0ZSkHjX9dVbHec3LVLBsHi1ZhuD8CvSnuOHWBHF6zAn22ze5TNDyCfr5o1jkVUX-cBLHY10pCkyC16dSvbxk5fy4ATMiCI3az1sR8fZpIRGEKMdBXXtLqUF3rKS3SAwAHYounfaSrn7sxczPxB_rJfBN1E"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Kaleido</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<div class="absolute inset-0 grid grid-cols-2 grid-rows-2">
+<img alt="Person 1" class="w-full h-full object-cover" data-alt="Grid item 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPDwQDxwbTwa8fVdIikNBckM3fTMg1X_fWvsuLgytTK93qtdOXNKSyxiDOImX808NJ1luOpPjkL2CZXyrnK67cB4qGpXRwnKUJfYdRnBP6siAYjfp2XdxLJQxhcgj_CxQFUnrpDjAfBs688mk1sd98SDjp3qoJaxFB9pnXMgs8HF2tlV5AYI1IoKyVU5YSG4O5ip1IGOM3cOQW9zp4z_S0QlL0XThsTxL7EZH_4gizxg2s5Q_DwAwzvTPQuuYWvULt5JHzl9vighg"/>
+<img alt="Person 2" class="w-full h-full object-cover filter hue-rotate-90" data-alt="Grid item 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_fY-fvFFz0brLrzBbTitfh-9Ah9IGDNDaXIAKAio27C0d0TvL7XlKumE29MpAeLpfme1nwglyFGZDegWAvvlqP1TOyuhJz_FdOMPzTZ0504GZwTR2j4N7r5owabMUfoD-nArACp1C3yQ2sj18yVTJgWPjigDEZ1_cI8k2giwQX1T8cefEybzEPyZHBQF6AsmEMp6gTsavmyP6PED4XU_vb7W_1Z9n9Jm8xn9BufC1Mn667p1i0Rp96AeHgUx3OHrADfdFThsqxEI"/>
+<img alt="Person 3" class="w-full h-full object-cover filter hue-rotate-180" data-alt="Grid item 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS3rbrF4kCssIrKLCzZo_Bn8qdBYzDUHR-L70GtjYVe0BZJz3dAZtIoUvhzwOhjHYjMTSJTYX1P8PQWp0YPJjtj0NhwM3leHrLUi_gygeLSae3xtOy8YQsmpw9y18YCHm7XIK58dHWS8jM707P_4mU4H29PeYoRFEdkXKkVg2WIkhsV2E1VZ8dHcwRuRUFBVfkKeQde8MaioIpTY1iUfKbiD7-c00Wq6gt0LvWQcS9bv-kK1eE2axW9xAuy1DuzfUO7C9a-96i3SM"/>
+<img alt="Person 4" class="w-full h-full object-cover filter grayscale" data-alt="Grid item 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxmoFdsA0t4s-jZRopnL4OMj79rXPfsVYHPsZir9Nkto76tqAxXE861iqOqEdJ8lU7xvzTgQIenerUZMUAOnPo0wY-4zAIF4OzwdJD_O6S3hapJKlpn3r1nRT2HeaYAqzFJJ2a9PV2_hT8PpftBlvGVw4MZP2yYiO7L2fEKWcjRadaquV6CMT7UrIYRNFrzbhm4DmSCMkfyux9Dh7okCjRM7zpJq0VaHwlCpAu-l_swcqOH7Rzu-9bjt4b60pvCiEkADauV9AJ0z4"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">4-Grid</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Ghostly motion blur effect" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 blur-[2px] brightness-125" data-alt="Ghostly motion blur effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlrH_SJpCuIjh4oIW0QUyVPx0RwmkmlNwlcH4As47jkuFQepTiOEHfnQ6F5AhLDpIyGMlxL3WPd8Ax760WhQe9-2vn7piKJtFMIuZWPEhqEbCT2s70RylqIR5msLlI4zZmXUpyMx3kNLgj_WhEZu6RUgStP6V5X3DiMKnNYVYKAmgD55eqV6-1ZhKpN79RCc8lg8NMhXelz8gJ8meZIUfr1hhAmnJUix8Gxq4AJSZY-cxs6h5NaALK-i8xDh3tPtYQocSfUqIY8u8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Ghost</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Warm old western sepia tone" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 sepia-[.80] contrast-125" data-alt="Warm old western sepia tone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQNppQRDKTyXkrX5qmmVoD3hTdnyUNIJZDl7k9R9auDVhQHRRlYDiRgPQ5LYAF5s8w2djst0xTAQkKLvmleaUQkqOLtcmG86Ubznh0dq558RpP4zqNMwsQq2kPEV0cPxkG8p_bMggcgDxQLbEkxDPWxy1kZQG9zQ5Sc3K3eX0LDqg1XNKNkQdJ3n6tGz9tHOYVsc6B3z_eMQawObovss0b5Q5Zwqz7tCfyU8O3AATHfVJSo9IdJcA8uKJGjoSi8xIV06yPIpM2HUI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Sepia</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Glowing lines edge detection" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 grayscale invert brightness-50 contrast-200" data-alt="Glowing lines edge detection" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9XoTTXHrW68V6Rzp0dofWdx6DRL9ZWP-V8DyI7aAXF-NoIX3ne-_7Ddw1PC7HVg_aUTjr7WHNJOoVCH086C_eDuVRXiyfXL8ESn2E4wNx4kgleoSHN1e8aBIfLn5ew1xO6kN2FyYntDeT97CAflTjEb5ytuW4CWeTlTGsmDIHatwIFNb1e2vvTX3Q7j_J6gizCA5dW6c7DB11sEUOCRBZKwzKLnSvvXissJ2Vf8RFM6fh6K0T9zaTogO43hk1ASq6vH7arWzeT4s"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Edge</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Water ripple distortion effect" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100" data-alt="Water ripple distortion effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPSWZUMqEC7Gy06YEO2KqrGfG90_huZVnrMHc9EfGPFqJ0KIUibvmdT31s8wriDS4p79HSmeCsA0vh3zwE7uG_zkHhQqTzq5nYrj8SuTBytLIDHwju6bBrpuT8r_MNEPzibTNjXveq6BlrY0eJGpiiIYWEAGWOoPjGJzLHh0181BPnu3tnSbE4fMdjQdWNXvb2U6tm4i-ePwS9iGTbkr973Wwf_5O0wh6AcAUMTtM1ly0I_M1sxWdWZdkGCp1lEXCYPWj-UVAaTfA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Ripple</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<img alt="Fire overlay effect" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 mix-blend-hard-light saturate-[2.0] hue-rotate-[-10deg]" data-alt="Fire overlay effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuz5jl2axcLl23RmQvlDEvDCPBIYAyZceQuxK1v_HrUEJCPWUaoaK9BAEn9ibWpgYzJaUERNdHPshT800oA33_ibpREaV3qGslC1CSpLU5dnDpUNa-us8VJflS8Iq8Cw43tNWcJAZeyDZ2NF3ZYrFyTeLdhnTHJQNQ8fVptb-vbeQxtEH270g303xrHvG2adwXC6lSnB0MyKDGHe8vI-37pHGZRjWA5B7DSljDb1lNxNQne68k3JEuIXqulTqyTH2rvm0R0hVxfbs"/>
+<div class="absolute inset-0 bg-orange-600/30 mix-blend-overlay"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform drop-shadow-md">Fire</span>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-md border border-gray-100 bg-white">
+<div class="absolute inset-y-0 left-0 w-4 bg-black flex flex-col justify-around z-10">
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+</div>
+<div class="absolute inset-y-0 right-0 w-4 bg-black flex flex-col justify-around z-10">
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+<div class="w-2 h-3 bg-white/50 rounded-sm mx-auto"></div>
+</div>
+<img alt="Cinematic film strip frame" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-100 grayscale" data-alt="Cinematic film strip frame" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdWyW_wKixaNw-KqmNs_e0mb7VDvSVOOLXxgGir46fl52R1VLbtJE6uOe3UL18jJ-N_zpgv8FFKsXQkytGJqf2WDANaQpfz5BdKnpcHwn58skniJyFcsZEVpARiiu1o_nu8cITgTM1aiMn0SEMA55LvVYbfsdlZdV8kDhHc4Ta56tG1YX0fxpPE8exk0m-H4XrDAwQl6UKsyGyebgE89kduwBXoNU4_CWf1rcFLGj2fbDopL5dxFY7VRWZ7ePJGnTbHDQm6j4Qws0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute inset-0 border-4 border-transparent group-hover:border-primary rounded-xl transition-colors duration-300 z-20 pointer-events-none"></div>
+<div class="absolute bottom-0 left-0 w-full p-4 z-10 flex flex-col justify-end">
+<span class="text-lg md:text-xl font-bold text-white tracking-wide group-hover:translate-y-[-2px] transition-transform pl-2 drop-shadow-md">Film</span>
+</div>
+</button>
+</div>
+</main>
+<div class="flex justify-center items-center py-2 space-x-2 shrink-0">
+<div class="w-2.5 h-2.5 rounded-full bg-primary shadow-sm"></div>
+<div class="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-400 cursor-pointer transition-colors"></div>
+<div class="w-2 h-2 rounded-full bg-gray-300 hover:bg-gray-400 cursor-pointer transition-colors"></div>
+</div>
+</div>
+
+</body></html>
