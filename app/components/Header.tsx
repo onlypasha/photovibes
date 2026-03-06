@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Images, Settings } from "lucide-react";
+import { Images } from "lucide-react";
 
 export default function Header() {
   return (
@@ -11,9 +11,6 @@ export default function Header() {
         >
           <Images className="w-5 h-5 text-gray-600" />
         </Link>
-        <button className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors">
-          <Settings className="w-5 h-5 text-gray-600" />
-        </button>
       </div>
     </header>
   );

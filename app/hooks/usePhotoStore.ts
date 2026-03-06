@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export interface PhotoData {
     id: string;
@@ -23,24 +23,12 @@ function loadPhotos(): PhotoData[] {
 }
 
 function savePhotos(photos: PhotoData[]) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(photos));
-    } catch (error) {
-        console.error("Failed to save photos to localStorage:", error);
-        // Optional: Dispatch a custom event or toast to notify user
-        if (error instanceof DOMException && error.name === "QuotaExceededError") {
-            alert("Gallery is full! Please delete some photos to save new ones.");
-        }
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(photos));
 }
 
 export function usePhotoStore() {
-    const [photos, setPhotos] = useState<PhotoData[]>([]);
-
-    // Load on mount
-    useEffect(() => {
-        setPhotos(loadPhotos());
-    }, []);
+    const [photos, setPhotos] = useState<PhotoData[]>(() => loadPhotos());
+    const [storageError, setStorageError] = useState<"quota_exceeded" | null>(null);
 
     // Listen for storage changes from other tabs
     useEffect(() => {
@@ -61,23 +49,48 @@ export function usePhotoStore() {
             ...(intensity !== undefined && { intensity }), // Include intensity only if provided
             timestamp: Date.now(),
         };
-        
+
         const currentPhotos = loadPhotos();
         const updatedPhotos = [newPhoto, ...currentPhotos];
-        
-        savePhotos(updatedPhotos);
-        
-        setPhotos(updatedPhotos);
+
+        try {
+            savePhotos(updatedPhotos);
+            setPhotos(updatedPhotos);
+            setStorageError(null);
+        } catch (error) {
+            console.error("Failed to save photos to localStorage:", error);
+            if (error instanceof DOMException && error.name === "QuotaExceededError") {
+                setStorageError("quota_exceeded");
+            }
+        }
     }, []);
 
     const deletePhoto = useCallback((id: string) => {
         const currentPhotos = loadPhotos();
         const updatedPhotos = currentPhotos.filter((p) => p.id !== id);
-        
-        savePhotos(updatedPhotos);
-        
-        setPhotos(updatedPhotos);
+
+        try {
+            savePhotos(updatedPhotos);
+            setPhotos(updatedPhotos);
+            if (storageError === "quota_exceeded") setStorageError(null);
+        } catch (error) {
+            console.error("Failed to delete photo from localStorage:", error);
+        }
+    }, [storageError]);
+
+    const clearOldestPhotos = useCallback((count: number = 5) => {
+        const currentPhotos = loadPhotos();
+        // Array is newest-first, so slicing from start keeps newest and drops oldest
+        const updatedPhotos = currentPhotos.slice(0, Math.max(0, currentPhotos.length - count));
+
+        try {
+            savePhotos(updatedPhotos);
+            setPhotos(updatedPhotos);
+            setStorageError(null);
+        } catch (error) {
+            console.error("Failed to clear old photos from localStorage:", error);
+        }
     }, []);
 
-    return { photos, addPhoto, deletePhoto };
+    return { photos, addPhoto, deletePhoto, storageError, setStorageError, clearOldestPhotos };
 }

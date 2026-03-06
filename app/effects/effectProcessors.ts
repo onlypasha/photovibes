@@ -192,7 +192,7 @@ const fisheye: Processor = (ctx, w, h, intensity) => {
             const dx = (x - cx) / cx;
             const dy = (y - cy) / cy;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            const r = Math.pow(dist, t) * maxR / Math.pow(1, t);
+            const r = Math.pow(dist, t) * maxR / Math.pow(maxR, t);
             const theta = Math.atan2(dy, dx);
             const srcX = Math.round(cx + r * Math.cos(theta));
             const srcY = Math.round(cy + r * Math.sin(theta));
@@ -203,7 +203,7 @@ const fisheye: Processor = (ctx, w, h, intensity) => {
 
             const dstIdx = (y * w + x) * 4;
             const srcIdx = (clampedY * w + clampedX) * 4;
-            
+
             d[dstIdx] = copy[srcIdx];
             d[dstIdx + 1] = copy[srcIdx + 1];
             d[dstIdx + 2] = copy[srcIdx + 2];
@@ -231,11 +231,11 @@ const bulge: Processor = (ctx, w, h, intensity) => {
                 const scale = 1 - amount * t * 0.6;
                 const srcX = Math.round(cx + dx * scale);
                 const srcY = Math.round(cy + dy * scale);
-                
+
                 // Clamp coordinates to valid ranges [0, width-1] and [0, height-1]
                 const clampedX = clampCoord(srcX, 0, w - 1);
                 const clampedY = clampCoord(srcY, 0, h - 1);
-                
+
                 const srcIdx = (clampedY * w + clampedX) * 4;
                 d[dstIdx] = copy[srcIdx];
                 d[dstIdx + 1] = copy[srcIdx + 1];
@@ -272,11 +272,11 @@ const pinch: Processor = (ctx, w, h, intensity) => {
                 const angle = Math.atan2(dy, dx);
                 const srcX = Math.round(cx + Math.cos(angle) * scale * radius);
                 const srcY = Math.round(cy + Math.sin(angle) * scale * radius);
-                
+
                 // Clamp coordinates to valid ranges [0, width-1] and [0, height-1]
                 const clampedX = clampCoord(srcX, 0, w - 1);
                 const clampedY = clampCoord(srcY, 0, h - 1);
-                
+
                 const srcIdx = (clampedY * w + clampedX) * 4;
                 d[dstIdx] = copy[srcIdx];
                 d[dstIdx + 1] = copy[srcIdx + 1];
@@ -564,6 +564,9 @@ const glitch: Processor = (ctx, w, h, _i, frame) => {
                 const dstIdx = (sy * w + x) * 4;
 
                 d[dstIdx] = copy[srcIdx];
+                d[dstIdx + 1] = copy[srcIdx + 1];
+                d[dstIdx + 2] = copy[srcIdx + 2];
+                d[dstIdx + 3] = copy[srcIdx + 3];
             }
         }
     }

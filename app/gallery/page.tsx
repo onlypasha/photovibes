@@ -1,11 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ArrowLeft,
     Camera,
-    Settings,
     Download,
     Trash2,
     ImageIcon,
@@ -43,7 +43,13 @@ const cardVariants = {
 
 export default function GalleryPage() {
     const { photos, deletePhoto } = usePhotoStore();
+    const [, setTick] = useState(0);
 
+    useEffect(() => {
+        // Fix #11: Update more frequently for smoother timeAgo transitions
+        const interval = setInterval(() => setTick(t => t + 1), 10000);
+        return () => clearInterval(interval);
+    }, []);
     const handleDownload = (src: string, id: string) => {
         const link = document.createElement("a");
         link.href = src;
@@ -86,11 +92,8 @@ export default function GalleryPage() {
                             </span>
                         </div>
 
-                        {/* Right: Settings */}
+                        {/* Right: Spacer for layout balance */}
                         <div className="flex items-center gap-4">
-                            <button className="p-2 rounded-full hover:bg-black/5 transition-colors">
-                                <Settings className="w-6 h-6" />
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -159,6 +162,7 @@ export default function GalleryPage() {
                                             alt={`Photo with ${photo.effect} effect`}
                                             className="w-full h-full object-cover"
                                             src={photo.src}
+                                            loading="lazy"
                                         />
 
                                         {/* Effect Badge + Timestamp */}
@@ -202,7 +206,7 @@ export default function GalleryPage() {
             <footer className="bg-background-light border-t border-neutral-200 py-8 mt-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-neutral-dark/40 text-sm">
-                        © 2025 PhotoVibes. Capture the moment.
+                        © {new Date().getFullYear()} PhotoVibes. Capture the moment.
                     </p>
                     <div className="flex gap-4">
                         <a className="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Privacy</a>

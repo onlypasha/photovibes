@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, X } from "lucide-react";
 import {
-    effects as allEffects,
     buildCssFilter,
     type EffectDefinition,
 } from "../effects/effectDefinitions";
 import { processors } from "../effects/effectProcessors";
+import IntensitySlider from "./IntensitySlider";
 
 const GRID_SIZE = 9; // 3x3
 // Lower resolution for grid previews to maintain performance
@@ -23,6 +23,7 @@ interface EffectPanelProps {
     onSelectEffect: (effect: EffectDefinition) => void;
     stream: MediaStream | null;
     effects: EffectDefinition[];
+    facingMode: "user" | "environment";
 }
 
 function LiveEffectCell({
@@ -30,11 +31,13 @@ function LiveEffectCell({
     video, // shared video element source
     isActive,
     onClick,
+    isMirrored,
 }: {
     effect: EffectDefinition;
     video: HTMLVideoElement | null;
     isActive: boolean;
     onClick: () => void;
+    isMirrored: boolean;
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const rafRef = useRef<number>(0);
@@ -63,9 +66,11 @@ function LiveEffectCell({
                 }
 
                 ctx.save();
-                // Mirror for selfie feel
-                ctx.translate(w, 0);
-                ctx.scale(-1, 1);
+                // Mirror only for front camera
+                if (isMirrored) {
+                    ctx.translate(w, 0);
+                    ctx.scale(-1, 1);
+                }
 
                 // Apply CSS filter for CSS-type effects if any
                 if (effect.type === "css" && effect.cssFilter) {
@@ -89,6 +94,8 @@ function LiveEffectCell({
                 }
 
                 frameRef.current++;
+                // Fix #12: Frame overflow protection (same as CameraStage)
+                if (frameRef.current > 10000) frameRef.current = 0;
             }
             rafRef.current = requestAnimationFrame(render);
         };
@@ -99,7 +106,7 @@ function LiveEffectCell({
             running = false;
             cancelAnimationFrame(rafRef.current);
         };
-    }, [video, effect]);
+    }, [video, effect, isMirrored]);
 
     return (
         <button
@@ -144,27 +151,47 @@ export default function EffectPanel({
     isOpen,
     onClose,
     activeEffectId,
+    intensity,
+    onIntensityChange,
     onSelectEffect,
     stream,
     effects,
+    facingMode,
 }: EffectPanelProps) {
     const [page, setPage] = useState(0);
     const totalPages = Math.ceil(effects.length / GRID_SIZE);
 
     // Use state to store the video element so children re-render when it's available
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+    const videoElementRef = useRef<HTMLVideoElement | null>(null);
+
+    const handleVideoRef = (el: HTMLVideoElement | null) => {
+        videoElementRef.current = el;
+        setVideoElement(el);
+    };
 
     useEffect(() => {
-        if (videoElement && stream) {
-            videoElement.srcObject = stream;
-            videoElement.play().catch(() => { });
+        const element = videoElementRef.current;
+        if (element && stream) {
+            element.srcObject = stream;
+            element.play().catch(() => { });
         }
+        return () => {
+            if (element) {
+                element.pause();
+                element.srcObject = null;
+                // Fix #5: Use removeAttribute instead of load() to avoid network request
+                element.removeAttribute('src');
+            }
+        };
     }, [stream, videoElement]);
 
     // Reset page to current effect when opening
     useEffect(() => {
         if (isOpen) {
             const idx = effects.findIndex((e) => e.id === activeEffectId);
+            // Sync panel page to the currently active effect whenever the panel is opened.
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             if (idx >= 0) setPage(Math.floor(idx / GRID_SIZE));
         }
     }, [isOpen, activeEffectId, effects]);
@@ -185,12 +212,20 @@ export default function EffectPanel({
                 >
                     {/* Shared source video - use opacity-0 instead of hidden to ensure it plays */}
                     <video
-                        ref={setVideoElement}
+                        ref={handleVideoRef}
                         playsInline
                         autoPlay
                         muted
                         className="absolute opacity-0 pointer-events-none w-1 h-1"
                     />
+
+                    {/* Close Button */}
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md text-white hover:bg-white/20 transition-all flex items-center justify-center"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
 
                     {/* Grid Content */}
                     <motion.main
@@ -209,6 +244,7 @@ export default function EffectPanel({
                                         video={videoElement}
                                         isActive={effect.id === activeEffectId}
                                         onClick={() => onSelectEffect(effect)}
+                                        isMirrored={facingMode === "user"}
                                     />
                                 ))}
                                 {/* Fillers to maintain grid shape if needed, or just let it flow */}
@@ -227,6 +263,21 @@ export default function EffectPanel({
 
                     {/* Controls Footer */}
                     <div className="shrink-0 pb-8 pt-2 flex flex-col items-center gap-4">
+                        {/* Intensity Slider - Only show for applicable effects */}
+                        {activeEffectId !== "normal" && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="w-full max-w-md px-6 py-4 bg-white/5 backdrop-blur-sm rounded-2xl mb-2"
+                            >
+                                <IntensitySlider
+                                    value={intensity}
+                                    onChange={onIntensityChange}
+                                    label="Effect Strength"
+                                />
+                            </motion.div>
+                        )}
+
                         {/* Nav Buttons */}
                         <div className="flex gap-6">
                             <motion.button

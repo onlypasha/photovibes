@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
   RefreshCw,
-  Maximize,
   Timer,
   Zap,
   ZapOff,
@@ -23,6 +22,10 @@ import {
 } from "../effects/effectDefinitions";
 import { processors } from "../effects/effectProcessors";
 import { usePhotoStore } from "../hooks/usePhotoStore";
+import { photostripTemplates } from "../effects/photostripConfig";
+import { generatePhotostrip } from "../effects/photostripGenerator";
+import PhotostripTemplatePicker from "./PhotostripTemplatePicker";
+import { Film } from "lucide-react";
 
 const TIMER_OPTIONS = [0, 3, 5, 10];
 const RENDER_SCALE = 0.5;
@@ -40,7 +43,21 @@ export default function CameraStage() {
   const [flashMode, setFlashMode] = useState<"auto" | "on" | "off">("auto");
   const [intensity, setIntensity] = useState(100);
   const [showEffectPanel, setShowEffectPanel] = useState(false);
-  
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+
+  // Photostrip State
+  const [isPhotostripMode, setIsPhotostripMode] = useState(false);
+  const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
+  const [sessionPhotos, setSessionPhotos] = useState<string[]>([]);
+  const [isProcessingStrip, setIsProcessingStrip] = useState(false);
+  const activeTemplate = photostripTemplates[selectedTemplateIndex];
+
+  // Fix #3: Ref to avoid stale closure for isPhotostripMode in doCapture
+  const isPhotostripModeRef = useRef(isPhotostripMode);
+  useEffect(() => {
+    isPhotostripModeRef.current = isPhotostripMode;
+  }, [isPhotostripMode]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const captureCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,10 +65,9 @@ export default function CameraStage() {
   const frameRef = useRef(0);
   const rafRef = useRef<number>(0);
   const isCapturing = useRef(false);
-  const handleCaptureRef = useRef<() => void>(() => {});
+  const handleCaptureRef = useRef<() => void>(() => { });
   const countdownInterval = useRef<NodeJS.Timeout | null>(null);
-
-  const { addPhoto } = usePhotoStore();
+  const brightnessCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const timerDuration = TIMER_OPTIONS[timerIndex];
   const activeEffect = getEffectById(activeEffectId) || allEffects[0];
@@ -85,9 +101,19 @@ export default function CameraStage() {
         }
         setCameraReady(true);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Camera error:", err);
-      setCameraError("Could not access camera. Please check permissions.");
+      let message = "An unexpected camera error occurred. Please refresh the page.";
+      const errorName = err instanceof DOMException ? err.name : "";
+
+      if (errorName === "NotAllowedError") {
+        message = "Camera permission denied. Please allow camera access in your browser settings.";
+      } else if (errorName === "NotFoundError" || errorName === "DevicesNotFoundError") {
+        message = "Camera not found. Please check your camera connection.";
+      } else if (errorName === "NotReadableError" || errorName === "TrackStartError") {
+        message = "Camera is already in use by another application.";
+      }
+      setCameraError(message);
       setCameraReady(false);
     }
   }, [facingMode]);
@@ -101,6 +127,8 @@ export default function CameraStage() {
     };
   }, [startCamera]);
 
+  const { addPhoto, storageError, setStorageError, clearOldestPhotos } = usePhotoStore();
+
   useEffect(() => {
     if (!cameraReady) return;
 
@@ -110,6 +138,12 @@ export default function CameraStage() {
 
     if (activeEffectId === "normal") {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      // Fix #9: Clear canvas to remove leftover frames from previous effect
+      const canvasEl = previewCanvasRef.current;
+      if (canvasEl) {
+        const clearCtx = canvasEl.getContext("2d");
+        if (clearCtx) clearCtx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      }
       return;
     }
 
@@ -155,6 +189,7 @@ export default function CameraStage() {
       }
 
       frameRef.current++;
+      if (frameRef.current > 10000) frameRef.current = 0;
       rafRef.current = requestAnimationFrame(render);
     };
 
@@ -171,14 +206,17 @@ export default function CameraStage() {
     const canvas = captureCanvasRef.current;
     if (!video || !canvas) return;
 
+    let frameBitmap: ImageBitmap | null = null;
+
     try {
-      const frameBitmap = await createImageBitmap(video);
+      if (typeof createImageBitmap === "function") {
+        frameBitmap = await createImageBitmap(video);
+      }
 
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) {
-        frameBitmap.close();
         return;
       }
 
@@ -194,7 +232,12 @@ export default function CameraStage() {
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
       }
-      ctx.drawImage(frameBitmap, 0, 0, canvas.width, canvas.height);
+
+      if (frameBitmap) {
+        ctx.drawImage(frameBitmap, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
       ctx.restore();
 
       if (activeEffect.type === "canvas" && activeEffect.canvasProcessor) {
@@ -204,13 +247,18 @@ export default function CameraStage() {
         }
       }
 
-      frameBitmap.close();
-
       const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-      addPhoto(dataUrl, activeEffect.name, intensity);
+      // Fix #3: Use ref to always get current isPhotostripMode
+      if (isPhotostripModeRef.current) {
+        setSessionPhotos((prev) => [...prev, dataUrl]);
+      } else {
+        addPhoto(dataUrl, activeEffect.name, intensity);
+      }
     } catch (error) {
       console.error("Error during photo capture:", error);
       throw error;
+    } finally {
+      frameBitmap?.close();
     }
   }, [activeEffect, facingMode, intensity, addPhoto]);
 
@@ -218,7 +266,10 @@ export default function CameraStage() {
     const video = videoRef.current;
     if (!video || video.readyState < 2) return 0;
 
-    const sampleCanvas = document.createElement("canvas");
+    if (!brightnessCanvasRef.current) {
+      brightnessCanvasRef.current = document.createElement("canvas");
+    }
+    const sampleCanvas = brightnessCanvasRef.current;
     const sampleSize = 64;
     sampleCanvas.width = sampleSize;
     sampleCanvas.height = sampleSize;
@@ -243,6 +294,11 @@ export default function CameraStage() {
     if (isCapturing.current) return;
     isCapturing.current = true;
 
+    // Fix #2: Safety timeout to auto-reset isCapturing if stuck
+    const safetyTimer = setTimeout(() => {
+      isCapturing.current = false;
+    }, 5000);
+
     let shouldFlash: boolean;
     if (flashMode === "on") {
       shouldFlash = true;
@@ -255,6 +311,7 @@ export default function CameraStage() {
     }
 
     const resetCapturing = () => {
+      clearTimeout(safetyTimer);
       isCapturing.current = false;
     };
 
@@ -291,6 +348,30 @@ export default function CameraStage() {
     handleCaptureRef.current = capturePhoto;
   }, [capturePhoto]);
 
+  useEffect(() => {
+    if (!isPhotostripMode) return;
+
+    if (sessionPhotos.length > 0 && sessionPhotos.length < activeTemplate.photosRequired) {
+      const delay = setTimeout(() => {
+        // Continue burst
+        setShowCountdown(true);
+      }, 1000); // 1 second buffer between shots to pose
+      return () => clearTimeout(delay);
+    } else if (sessionPhotos.length === activeTemplate.photosRequired) {
+      // Process strip
+      setIsProcessingStrip(true);
+      generatePhotostrip(activeTemplate, sessionPhotos)
+        .then((stripDataUrl) => {
+          addPhoto(stripDataUrl, `Photostrip - ${activeTemplate.name}`);
+        })
+        .catch(console.error)
+        .finally(() => {
+          setIsProcessingStrip(false);
+          setSessionPhotos([]);
+        });
+    }
+  }, [sessionPhotos, isPhotostripMode, activeTemplate, addPhoto]);
+
   const handleCapture = useCallback(() => {
     handleCaptureRef.current();
     setShowCountdown(false);
@@ -313,7 +394,8 @@ export default function CameraStage() {
       countdownInterval.current = null;
     }
 
-    setCount(timerDuration); 
+    const actualTimer = (isPhotostripMode && timerDuration === 0) ? 3 : timerDuration;
+    setCount(actualTimer);
 
     const interval = setInterval(() => {
       setCount((prev) => {
@@ -322,8 +404,11 @@ export default function CameraStage() {
             clearInterval(countdownInterval.current);
             countdownInterval.current = null;
           }
-          handleCaptureRef.current();
-          setShowCountdown(false);
+          // Fix #13: Use setTimeout(0) to avoid calling capture inside setState
+          setTimeout(() => {
+            handleCaptureRef.current();
+            setShowCountdown(false);
+          }, 0);
           return 0;
         }
         return prev - 1;
@@ -339,7 +424,7 @@ export default function CameraStage() {
         countdownInterval.current = null;
       }
     };
-  }, [showCountdown, timerDuration]); 
+  }, [showCountdown, timerDuration, isPhotostripMode]);
 
   const cancelCountdown = useCallback(() => {
     if (countdownInterval.current) {
@@ -351,12 +436,17 @@ export default function CameraStage() {
   }, []);
 
   const handleShutterClick = useCallback(() => {
-    if (timerDuration > 0) {
+    if (isPhotostripMode) {
+      // Fix #4: Don't reset session if one is already in progress
+      if (sessionPhotos.length > 0 || showCountdown) return;
+    }
+
+    if (timerDuration > 0 || isPhotostripMode) {
       setShowCountdown(true);
     } else {
       handleCapture();
     }
-  }, [timerDuration, handleCapture]);
+  }, [timerDuration, handleCapture, isPhotostripMode, sessionPhotos.length, showCountdown]);
 
   const cycleTimer = () => setTimerIndex((prev) => (prev + 1) % TIMER_OPTIONS.length);
   const cycleFlash = () => setFlashMode((prev) => prev === "auto" ? "on" : prev === "on" ? "off" : "auto");
@@ -379,7 +469,7 @@ export default function CameraStage() {
 
   return (
     <>
-      <video ref={videoRef} autoPlay playsInline muted className="hidden" />
+      {/* Fix #1: Removed duplicate <video> element — only the visible one below uses videoRef */}
       <canvas ref={captureCanvasRef} className="hidden" />
 
       <AnimatePresence>
@@ -396,24 +486,24 @@ export default function CameraStage() {
 
       <div className="flex-1 flex flex-col items-center justify-center relative w-full px-4 sm:px-6 lg:px-8 pb-4">
         <div className="flex flex-col items-center w-full max-w-4xl">
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] ring-4 ring-offset-4 ring-offset-background-light ring-primary/30 group"
           >
-            <video 
+            <video
               ref={videoRef}
-              autoPlay 
-              playsInline 
-              muted 
+              autoPlay
+              playsInline
+              muted
               className={`absolute inset-0 w-full h-full object-cover ${activeEffectId === 'normal' ? 'block' : 'hidden'}`}
               style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
             />
-            <canvas 
-              ref={previewCanvasRef} 
-              className={`absolute inset-0 w-full h-full object-cover ${activeEffectId !== 'normal' ? 'block' : 'hidden'}`} 
+            <canvas
+              ref={previewCanvasRef}
+              className={`absolute inset-0 w-full h-full object-cover ${activeEffectId !== 'normal' ? 'block' : 'hidden'}`}
             />
 
             {!cameraReady && (
@@ -442,7 +532,21 @@ export default function CameraStage() {
             )}
 
             <AnimatePresence>
-              {cameraReady && !showCountdown && showOverlayText && (
+              {isProcessingStrip && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-40 backdrop-blur-sm"
+                >
+                  <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-white text-lg font-medium">Processing Photostrip...</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {cameraReady && !showCountdown && showOverlayText && !isProcessingStrip && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -466,9 +570,7 @@ export default function CameraStage() {
               >
                 <RefreshCw className="w-5 h-5 group-hover/btn:animate-spin" />
               </button>
-              <button className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content transition-all flex items-center justify-center">
-                <Maximize className="w-5 h-5" />
-              </button>
+
               <button
                 onClick={() => setShowOverlayText((prev) => !prev)}
                 className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content transition-all flex items-center justify-center"
@@ -481,7 +583,38 @@ export default function CameraStage() {
               </button>
             </div>
 
-            <div className="absolute bottom-6 left-6 flex gap-3 z-20">
+            <div className="absolute bottom-6 left-6 flex gap-2 sm:gap-3 z-20 flex-wrap">
+              <button
+                onClick={() => setIsPhotostripMode((prev) => !prev)}
+                className={`h-10 px-4 rounded-full backdrop-blur-md transition-all flex items-center gap-2 text-sm font-medium ${isPhotostripMode
+                  ? "bg-primary text-black"
+                  : "bg-black/40 text-white hover:bg-white hover:text-black"
+                  }`}
+              >
+                <Film className="w-4 h-4" />
+                <span className="hidden sm:inline">Photostrip</span>
+              </button>
+
+              <AnimatePresence>
+                {isPhotostripMode && (
+                  <motion.button
+                    initial={{ opacity: 0, width: 0, padding: 0 }}
+                    animate={{ opacity: 1, width: "auto", padding: "0 1rem" }}
+                    exit={{ opacity: 0, width: 0, padding: 0, margin: 0 }}
+                    onClick={() => setShowTemplatePicker(true)}
+                    className="h-10 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-white hover:text-black transition-all flex items-center justify-center gap-2 text-sm font-medium overflow-hidden whitespace-nowrap"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={activeTemplate.src}
+                      alt={activeTemplate.name}
+                      className="w-6 h-8 object-contain rounded-sm opacity-80"
+                    />
+                    {activeTemplate.name}
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
               <button
                 onClick={cycleTimer}
                 className="h-10 px-4 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-white hover:text-black transition-all flex items-center gap-2 text-sm font-medium"
@@ -491,13 +624,12 @@ export default function CameraStage() {
               </button>
               <button
                 onClick={cycleFlash}
-                className={`h-10 px-4 rounded-full backdrop-blur-md hover:bg-white hover:text-black transition-all flex items-center gap-2 text-sm font-medium ${
-                  flashMode === "on"
-                    ? "bg-primary text-black"
-                    : flashMode === "off"
+                className={`h-10 px-4 rounded-full backdrop-blur-md hover:bg-white hover:text-black transition-all flex items-center gap-2 text-sm font-medium ${flashMode === "on"
+                  ? "bg-primary text-black"
+                  : flashMode === "off"
                     ? "bg-black/40 text-white/50"
                     : "bg-black/40 text-white"
-                }`}
+                  }`}
               >
                 {flashMode === "off" ? (
                   <ZapOff className="w-4 h-4" />
@@ -511,14 +643,26 @@ export default function CameraStage() {
             <div className="absolute top-6 left-6 z-20 flex flex-col gap-3">
               <button
                 onClick={() => setShowEffectPanel(true)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition-all hover:scale-105 cursor-pointer ${
-                  activeEffectId !== "normal"
-                    ? "bg-primary text-primary-content"
-                    : "bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content"
-                }`}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition-all hover:scale-105 cursor-pointer ${activeEffectId !== "normal"
+                  ? "bg-primary text-primary-content"
+                  : "bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content"
+                  }`}
               >
                 {`${activeEffect.icon} ${activeEffect.name}`}
               </button>
+
+              <AnimatePresence>
+                {isPhotostripMode && (showCountdown || sessionPhotos.length > 0) && !isProcessingStrip && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="px-3 py-1.5 rounded-full text-xs font-bold shadow-md bg-white text-black text-center"
+                  >
+                    Photo {Math.min(sessionPhotos.length + 1, activeTemplate.photosRequired)} of {activeTemplate.photosRequired}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -576,13 +720,64 @@ export default function CameraStage() {
         onIntensityChange={setIntensity}
         stream={streamRef.current}
         effects={allEffects}
+        facingMode={facingMode}
         onSelectEffect={(effect) => {
           handleSelectEffect(effect);
           setShowEffectPanel(false);
         }}
       />
 
+      <PhotostripTemplatePicker
+        isOpen={showTemplatePicker && isPhotostripMode}
+        onClose={() => setShowTemplatePicker(false)}
+        templates={photostripTemplates}
+        activeTemplateId={activeTemplate.id}
+        onSelectTemplate={(index) => {
+          setSelectedTemplateIndex(index);
+          setShowTemplatePicker(false);
+        }}
+      />
+
       <CountdownOverlay isOpen={showCountdown && count > 0} count={count} />
+
+      <AnimatePresence>
+        {storageError === "quota_exceeded" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl text-center"
+            >
+              <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <X className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Gallery is Full!</h3>
+              <p className="text-gray-600 mb-8">
+                You&apos;ve reached the storage limit. Please delete some old photos to continue capturing new memories.
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => clearOldestPhotos(5)}
+                  className="w-full py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-colors"
+                >
+                  Delete 5 Oldest Photos
+                </button>
+                <button
+                  onClick={() => setStorageError(null)}
+                  className="w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

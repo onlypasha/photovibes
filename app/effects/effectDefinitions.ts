@@ -115,17 +115,18 @@ export function buildCssFilter(effect: EffectDefinition, intensity: number): str
 
             // For filters that default to 1 (like saturate, contrast, brightness)
             if (["grayscale", "sepia", "blur"].includes(fn)) {
-                const unit = val.replace(String(num), "").trim();
+                // Fix #8: Safer unit extraction via regex
+                const unit = val.match(/[a-z%]+$/i)?.[0] || "";
                 return `${fn}(${(num * scale).toFixed(2)}${unit})`;
             }
             // For hue-rotate, scale the degrees
             if (fn === "hue-rotate") {
-                const unit = val.replace(String(num), "").trim();
+                const unit = val.match(/[a-z%]+$/i)?.[0] || "";
                 return `${fn}(${(num * scale).toFixed(1)}${unit})`;
             }
             // For brightness, contrast, saturate: interpolate toward 1
             const adjusted = 1 + (num - 1) * scale;
-            const unit = val.replace(String(num), "").trim();
+            const unit = val.match(/[a-z%]+$/i)?.[0] || "";
             return `${fn}(${adjusted.toFixed(2)}${unit})`;
         }
     );
