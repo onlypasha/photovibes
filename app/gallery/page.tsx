@@ -209,9 +209,9 @@ export default function GalleryPage() {
                         © {new Date().getFullYear()} PhotoVibes. Capture the moment.
                     </p>
                     <div className="flex gap-4">
-                        <a className="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Privacy</a>
-                        <a className="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Terms</a>
-                        <a className="text-neutral-dark/40 hover:text-primary transition-colors" href="#">Help</a>
+                        <Link className="text-neutral-dark/40 hover:text-primary transition-colors" href="/privacy">Privacy</Link>
+                        <Link className="text-neutral-dark/40 hover:text-primary transition-colors" href="/terms">Terms</Link>
+                        <Link className="text-neutral-dark/40 hover:text-primary transition-colors" href="/help">Help</Link>
                     </div>
                 </div>
             </footer>

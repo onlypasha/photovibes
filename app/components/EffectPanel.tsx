@@ -160,6 +160,7 @@ export default function EffectPanel({
 }: EffectPanelProps) {
     const [page, setPage] = useState(0);
     const totalPages = Math.ceil(effects.length / GRID_SIZE);
+    const activeEffect = effects.find((effect) => effect.id === activeEffectId);
 
     // Use state to store the video element so children re-render when it's available
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
@@ -264,7 +265,7 @@ export default function EffectPanel({
                     {/* Controls Footer */}
                     <div className="shrink-0 pb-8 pt-2 flex flex-col items-center gap-4">
                         {/* Intensity Slider - Only show for applicable effects */}
-                        {activeEffectId !== "normal" && (
+                        {activeEffect?.hasIntensity && (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}

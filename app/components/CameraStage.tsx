@@ -127,7 +127,7 @@ export default function CameraStage() {
     };
   }, [startCamera]);
 
-  const { addPhoto, storageError, setStorageError, clearOldestPhotos } = usePhotoStore();
+  const { photos, addPhoto, storageError, setStorageError, clearOldestPhotos } = usePhotoStore();
 
   useEffect(() => {
     if (!cameraReady) return;
@@ -763,9 +763,24 @@ export default function CameraStage() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => clearOldestPhotos(5)}
-                  className="w-full py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-colors"
+                  disabled={photos.length < 5}
+                  className="w-full py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Delete 5 Oldest Photos
+                </button>
+                <button
+                  onClick={() => clearOldestPhotos(10)}
+                  disabled={photos.length < 10}
+                  className="w-full py-3 bg-amber-100 text-amber-900 font-bold rounded-xl hover:bg-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Delete 10 Oldest Photos
+                </button>
+                <button
+                  onClick={() => clearOldestPhotos(photos.length)}
+                  disabled={photos.length === 0}
+                  className="w-full py-3 bg-rose-100 text-rose-900 font-bold rounded-xl hover:bg-rose-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear Entire Gallery
                 </button>
                 <button
                   onClick={() => setStorageError(null)}
