@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   X,
+  Sparkles,
 } from "lucide-react";
 import CountdownOverlay from "./CountdownOverlay";
 import EffectPanel from "./EffectPanel";
@@ -28,7 +29,15 @@ import PhotostripTemplatePicker from "./PhotostripTemplatePicker";
 import { Film } from "lucide-react";
 
 const TIMER_OPTIONS = [0, 3, 5, 10];
-const RENDER_SCALE = 0.5;
+const RENDER_SCALE = 0.75;
+
+type CaptureQuality = "standard" | "high" | "max";
+const QUALITY_SETTINGS: Record<CaptureQuality, { format: string; quality: number; label: string }> = {
+  standard: { format: "image/jpeg", quality: 0.85, label: "SD" },
+  high: { format: "image/jpeg", quality: 0.92, label: "HD" },
+  max: { format: "image/png", quality: 1.0, label: "MAX" },
+};
+const QUALITY_ORDER: CaptureQuality[] = ["standard", "high", "max"];
 
 export default function CameraStage() {
   const [showCountdown, setShowCountdown] = useState(false);
@@ -44,6 +53,7 @@ export default function CameraStage() {
   const [intensity, setIntensity] = useState(100);
   const [showEffectPanel, setShowEffectPanel] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [captureQuality, setCaptureQuality] = useState<CaptureQuality>("high");
 
   // Photostrip State
   const [isPhotostripMode, setIsPhotostripMode] = useState(false);
@@ -82,8 +92,8 @@ export default function CameraStage() {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
         audio: false,
       });
@@ -247,7 +257,8 @@ export default function CameraStage() {
         }
       }
 
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      const { format, quality: q } = QUALITY_SETTINGS[captureQuality];
+      const dataUrl = canvas.toDataURL(format, q);
       // Fix #3: Use ref to always get current isPhotostripMode
       if (isPhotostripModeRef.current) {
         setSessionPhotos((prev) => [...prev, dataUrl]);
@@ -260,7 +271,7 @@ export default function CameraStage() {
     } finally {
       frameBitmap?.close();
     }
-  }, [activeEffect, facingMode, intensity, addPhoto]);
+  }, [activeEffect, facingMode, intensity, addPhoto, captureQuality]);
 
   const measureBrightness = useCallback((): number => {
     const video = videoRef.current;
@@ -569,6 +580,20 @@ export default function CameraStage() {
                 className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-primary hover:text-primary-content transition-all flex items-center justify-center group/btn"
               >
                 <RefreshCw className="w-5 h-5 group-hover/btn:animate-spin" />
+              </button>
+
+              <button
+                onClick={() => setCaptureQuality((prev) => QUALITY_ORDER[(QUALITY_ORDER.indexOf(prev) + 1) % QUALITY_ORDER.length])}
+                className={`w-12 h-12 rounded-full backdrop-blur-md transition-all flex flex-col items-center justify-center gap-0.5 ${captureQuality === "max"
+                  ? "bg-emerald-500/70 text-white"
+                  : captureQuality === "high"
+                    ? "bg-amber-500/50 text-white"
+                    : "bg-black/40 text-white/70"
+                  }`}
+                title={`Quality: ${QUALITY_SETTINGS[captureQuality].label}`}
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-[9px] font-bold leading-none">{QUALITY_SETTINGS[captureQuality].label}</span>
               </button>
 
               <button
